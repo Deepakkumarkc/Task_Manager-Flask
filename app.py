@@ -7,12 +7,12 @@ from werkzeug.utils import redirect
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
-db= SQLAlchemy(app)
+db= SQLAlchemy(app) #db connection
 
 class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key= True)
-    content = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    id = db.Column(db.Integer, primary_key= True)   #Db table data
+    content = db.Column(db.String(200), nullable=False)     #Db table data
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)    #Db table data
 
     def __repr__(self):
         return '<Task %r>' % self.id  
@@ -21,11 +21,11 @@ class Todo(db.Model):
 
 def index():
     if request.method == 'POST':
-        task_content = request.form['content']
-        new_task = Todo(content = task_content)
+        task_content = request.form['content'] # Get the content in form
+        new_task = Todo(content = task_content) # store the content in todo object
 
         try:
-            db.session.add(new_task)
+            db.session.add(new_task)    # add task in db
             db.session.commit()
             return redirect('/')
         
@@ -34,14 +34,14 @@ def index():
     
     else:
         tasks = Todo.query.order_by(Todo.date_created).all()
-        return render_template('index.html',tasks=tasks)
+        return render_template('index.html',tasks=tasks) 
 
 @app.route('/delete/<int:id>',methods = ['POST','GET'])
 def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
+    task_to_delete = Todo.query.get_or_404(id)  #Get the task id and fetch the detail in db
 
     try:
-        db.session.delete(task_to_delete)
+        db.session.delete(task_to_delete)   # delete task in db
         db.session.commit()
         return redirect('/')
     except:
@@ -50,13 +50,13 @@ def delete(id):
 
 @app.route('/update/<int:id>',methods = ['POST','GET'])
 def update(id):
-    task= Todo.query.get_or_404(id)
+    task= Todo.query.get_or_404(id)     # get the task using id and update
      
     if request.method == 'POST':
         task.content = request.form['content']
 
         try:
-            db.session.commit()
+            db.session.commit()     # update task in db
             return redirect('/') 
         except:
             return 'Unable to update'       
